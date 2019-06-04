@@ -12,7 +12,7 @@ namespace ServerSound
         public static void wi_DataAvailable(object sender, WaveInEventArgs e)
         {
             if (ActivClients != null)
-                ActivClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded);
+                ActivClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded).Wait();
         }
 
 
