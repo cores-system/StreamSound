@@ -137,6 +137,12 @@ namespace Client
                 if (acceptedPackages == 0)
                     watch.Start();
 
+                // Пустой пакет
+                if (BytesRecorded == 0) {
+                    acceptedPackages++;
+                    return;
+                }
+
                 // Пакет пришел слишком поздно, вместо части пакета уже проигран пустой звук
                 if (acceptedPackages > 0 && watch.ElapsedMilliseconds > (acceptedPackages * bufferMilliseconds))
                 {
@@ -157,7 +163,7 @@ namespace Client
                         DateTime.Now.Minute + ":" + DateTime.Now.Second + "" + DateTime.Now.Millisecond + Environment.NewLine +
                         "differenceMs: " + differenceMs + Environment.NewLine + 
                         "offset: " + offset + Environment.NewLine +
-                        "watch: " + watch.ElapsedMilliseconds + " / " + (acceptedPackages * bufferMilliseconds) + 
+                        "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) + 
                         Environment.NewLine + Environment.NewLine
                     );
                 }

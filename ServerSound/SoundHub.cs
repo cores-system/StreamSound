@@ -27,9 +27,16 @@ namespace ServerSound
                     break;
                 }
 
-                // Есть аудио
-                if (BytesRecorded > 0)
+                if (BytesRecorded == 0)
+                {
+                    // Пустой пакет
+                    ActivClients.All.SendAsync("DataAvailable", new byte[0], 0);
+                }
+                else
+                {
+                    // Есть аудио
                     ActivClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded);
+                }
             }
         }
 
