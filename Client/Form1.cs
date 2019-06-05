@@ -137,12 +137,6 @@ namespace Client
                 if (acceptedPackages == 0)
                     watch.Start();
 
-                // Пустой пакет
-                if (BytesRecorded == 0) {
-                    acceptedPackages++;
-                    return;
-                }
-
                 // Пакет пришел слишком поздно, вместо части пакета уже проигран пустой звук
                 if (acceptedPackages > 0 && watch.ElapsedMilliseconds > (acceptedPackages * bufferMilliseconds))
                 {
@@ -150,7 +144,7 @@ namespace Client
                     long differenceMs = watch.ElapsedMilliseconds - (acceptedPackages * bufferMilliseconds);
 
                     // Разница больше BufferMilliseconds
-                    if (bufferMilliseconds >= differenceMs) {
+                    if (differenceMs >= bufferMilliseconds) {
                         acceptedPackages++;
                         return;
                     }
@@ -158,14 +152,15 @@ namespace Client
                     // Смещаем offset
                     offset = (int)(differenceMs * 192); // 1ms = 192 byte
 
-                    // debug
-                    File.AppendAllText("debug.txt", 
-                        DateTime.Now.Minute + ":" + DateTime.Now.Second + "" + DateTime.Now.Millisecond + Environment.NewLine +
-                        "differenceMs: " + differenceMs + Environment.NewLine + 
-                        "offset: " + offset + Environment.NewLine +
-                        "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) + 
-                        Environment.NewLine + Environment.NewLine
-                    );
+                    #region debug
+                    //File.AppendAllText("debug.txt", 
+                    //    DateTime.Now.Minute + ":" + DateTime.Now.Second + "" + DateTime.Now.Millisecond + Environment.NewLine +
+                    //    "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine + 
+                    //    "offset: " + offset + Environment.NewLine +
+                    //    "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) + 
+                    //    Environment.NewLine + Environment.NewLine
+                    //);
+                    #endregion
                 }
 
                 // Заполняем буфер
