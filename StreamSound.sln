@@ -7,7 +7,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ServerSound", "ServerSound\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "InfoDevices", "InfoDevices\InfoDevices.csproj", "{161B92C4-0174-4620-B2ED-B92410D83F3F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Client", "Client\Client.csproj", "{3A1114D8-53A5-4CD5-B305-FD363FBF4337}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Client", "Client\Client.csproj", "{3A1114D8-53A5-4CD5-B305-FD363FBF4337}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{11ABBD65-C150-4348-98D3-4440B9A95D36}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{3A1114D8-53A5-4CD5-B305-FD363FBF4337}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3A1114D8-53A5-4CD5-B305-FD363FBF4337}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3A1114D8-53A5-4CD5-B305-FD363FBF4337}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11ABBD65-C150-4348-98D3-4440B9A95D36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11ABBD65-C150-4348-98D3-4440B9A95D36}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11ABBD65-C150-4348-98D3-4440B9A95D36}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11ABBD65-C150-4348-98D3-4440B9A95D36}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

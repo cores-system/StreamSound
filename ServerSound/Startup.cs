@@ -12,6 +12,7 @@ namespace ServerSound
     public class Startup
     {
         static WaveInEvent wi;
+        public static Settings s = new Settings();
 
         #region ConfigureServices
         public void ConfigureServices(IServiceCollection services)
@@ -22,7 +23,6 @@ namespace ServerSound
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Settings s = new Settings();
             if (File.Exists("settings.json"))
                 s = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
 
