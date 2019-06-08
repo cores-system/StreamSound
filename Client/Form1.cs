@@ -11,9 +11,6 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-        Stopwatch watch;
-        long acceptedPackages;
-
         #region Form
         static WaveOutEvent wo;
         static BufferedWaveProvider bwp;
@@ -131,7 +128,7 @@ namespace Client
         async void SoundPlay()
         {
             int bufferMilliseconds = 20;
-            watch = new Stopwatch();
+            Stopwatch watch = new Stopwatch();
 
             #region ConnectionId
             hubConnection.On<string, int>("ConnectionId", (ConnectionId, BufferMilliseconds) =>
@@ -142,7 +139,7 @@ namespace Client
             #endregion
 
             #region DataAvailable
-            acceptedPackages = 0;
+            long acceptedPackages = 0;
             hubConnection.On<byte[], int>("DataAvailable", (Buffer, BytesRecorded) =>
             {
                 int offset = 0;
@@ -210,9 +207,7 @@ namespace Client
         #region RestartTimePlay
         private void RestartTimePlay(object sender, EventArgs e)
         {
-            bwp?.ClearBuffer();
-            watch?.Reset();
-            acceptedPackages = 0;
+            bwp.ClearBuffer();
         }
         #endregion
     }
