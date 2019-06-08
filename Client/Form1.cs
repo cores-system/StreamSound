@@ -11,12 +11,16 @@ namespace Client
 {
     public partial class Form1 : Form
     {
+        Stopwatch watch;
+        long acceptedPackages;
+
         #region Form
         static WaveOutEvent wo;
         static BufferedWaveProvider bwp;
         HubConnection hubConnection;
         NotifyIcon ni = new NotifyIcon();
         TextBox textBox1;
+        private Button button1;
 
         public Form1()
         {
@@ -29,12 +33,22 @@ namespace Client
             this.Width = 600;
 
             this.textBox1.Anchor = ((AnchorStyles)((((AnchorStyles.Top | AnchorStyles.Bottom) | AnchorStyles.Left) | AnchorStyles.Right)));
-            this.textBox1.Location = new Point(0, 0);
+            this.textBox1.Location = new Point(0, 60);
             this.textBox1.Multiline = true;
             this.textBox1.ReadOnly = true;
             this.textBox1.Size = new Size(600, 400);
             this.textBox1.TabIndex = 0;
             this.Controls.Add(this.textBox1);
+
+
+            this.button1 = new Button();
+            this.button1.Location = new Point(12, 12);
+            this.button1.Size = new Size(75, 23);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "Очистить буфер";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new EventHandler(this.RestartTimePlay);
+            this.Controls.Add(this.button1);
 
             ni = new NotifyIcon();
             ni.Icon = new Icon("tree.ico");
@@ -117,7 +131,7 @@ namespace Client
         async void SoundPlay()
         {
             int bufferMilliseconds = 20;
-            Stopwatch watch = new Stopwatch();
+            watch = new Stopwatch();
 
             #region ConnectionId
             hubConnection.On<string, int>("ConnectionId", (ConnectionId, BufferMilliseconds) =>
@@ -128,7 +142,7 @@ namespace Client
             #endregion
 
             #region DataAvailable
-            long acceptedPackages = 0;
+            acceptedPackages = 0;
             hubConnection.On<byte[], int>("DataAvailable", (Buffer, BytesRecorded) =>
             {
                 int offset = 0;
@@ -146,6 +160,15 @@ namespace Client
                     // Разница больше BufferMilliseconds
                     if (differenceMs >= bufferMilliseconds) {
                         acceptedPackages++;
+
+                        #region debug
+                        File.AppendAllText("debug.txt",
+                            DateTime.Now.ToString() + "." + DateTime.Now.Millisecond + Environment.NewLine +
+                            "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
+                            "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) +
+                            Environment.NewLine + Environment.NewLine
+                        );
+                        #endregion
                         return;
                     }
 
@@ -153,13 +176,13 @@ namespace Client
                     offset = (int)(differenceMs * 192); // 1ms = 192 byte
 
                     #region debug
-                    //File.AppendAllText("debug.txt", 
-                    //    DateTime.Now.Minute + ":" + DateTime.Now.Second + "" + DateTime.Now.Millisecond + Environment.NewLine +
-                    //    "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine + 
-                    //    "offset: " + offset + Environment.NewLine +
-                    //    "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) + 
-                    //    Environment.NewLine + Environment.NewLine
-                    //);
+                    File.AppendAllText("debug.txt",
+                        DateTime.Now.ToString() + "." + DateTime.Now.Millisecond + Environment.NewLine +
+                        "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
+                        "offset: " + offset + Environment.NewLine +
+                        "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) +
+                        Environment.NewLine + Environment.NewLine
+                    );
                     #endregion
                 }
 
@@ -180,6 +203,16 @@ namespace Client
                 await HubConnection_Closed(null);
             }
             #endregion
+        }
+        #endregion
+
+
+        #region RestartTimePlay
+        private void RestartTimePlay(object sender, EventArgs e)
+        {
+            bwp?.ClearBuffer();
+            watch?.Reset();
+            acceptedPackages = 0;
         }
         #endregion
     }
