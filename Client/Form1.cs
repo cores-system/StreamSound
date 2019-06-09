@@ -128,63 +128,57 @@ namespace Client
         async void SoundPlay()
         {
             int bufferMilliseconds = 20;
-            Stopwatch watch = new Stopwatch();
+            double timeDifferenceWithServer = 0;
 
             #region ConnectionId
-            hubConnection.On<string, int>("ConnectionId", (ConnectionId, BufferMilliseconds) =>
+            hubConnection.On<string, int, DateTime>("ConnectionId", (ConnectionId, BufferMilliseconds, serverTime) =>
             {
                 textBox1.Text = "Id: " + ConnectionId + Environment.NewLine;
                 bufferMilliseconds = BufferMilliseconds;
+                timeDifferenceWithServer = (DateTime.Now - serverTime).TotalMilliseconds;
             });
             #endregion
 
             #region DataAvailable
-            long acceptedPackages = 0;
-            hubConnection.On<byte[], int>("DataAvailable", (Buffer, BytesRecorded) =>
+            hubConnection.On<byte[], int, DateTime>("DataAvailable", (Buffer, BytesRecorded, soundPlayTime) =>
             {
                 int offset = 0;
+                DateTime currentTime = DateTime.Now;
+                soundPlayTime = soundPlayTime.AddMilliseconds(timeDifferenceWithServer);
 
-                // Начало воспроизведения звука
-                if (acceptedPackages == 0)
-                    watch.Start();
-
-                // Пакет пришел слишком поздно, вместо части пакета уже проигран пустой звук
-                if (acceptedPackages > 0 && watch.ElapsedMilliseconds > (acceptedPackages * bufferMilliseconds))
+                // Пакет пришел слишком поздно
+                if (currentTime > soundPlayTime)
                 {
                     // Разница времени
-                    long differenceMs = watch.ElapsedMilliseconds - (acceptedPackages * bufferMilliseconds);
+                    double differenceMs = (DateTime.Now - soundPlayTime).TotalMilliseconds;
 
-                    // Разница больше BufferMilliseconds
-                    if (differenceMs >= bufferMilliseconds) {
-                        acceptedPackages++;
+                    // Смещаем offset
+                    offset = (int)(differenceMs * 192); // 1ms = 192 byte
+
+                    // Разница больше BufferMilliseconds или больше пакета
+                    if (differenceMs >= bufferMilliseconds || offset >= BytesRecorded) {
 
                         #region debug
                         File.AppendAllText("debug.txt",
-                            DateTime.Now.ToString() + "." + DateTime.Now.Millisecond + Environment.NewLine +
+                            currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
                             "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
-                            "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) +
                             Environment.NewLine + Environment.NewLine
                         );
                         #endregion
                         return;
                     }
 
-                    // Смещаем offset
-                    offset = (int)(differenceMs * 192); // 1ms = 192 byte
-
                     #region debug
                     File.AppendAllText("debug.txt",
-                        DateTime.Now.ToString() + "." + DateTime.Now.Millisecond + Environment.NewLine +
+                        currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
                         "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
                         "offset: " + offset + Environment.NewLine +
-                        "watch: " + watch.ElapsedMilliseconds + " / " + acceptedPackages + " = " + (acceptedPackages * bufferMilliseconds) +
                         Environment.NewLine + Environment.NewLine
                     );
                     #endregion
                 }
 
                 // Заполняем буфер
-                acceptedPackages++;
                 bwp.AddSamples(Buffer, offset, BytesRecorded);
             });
             #endregion

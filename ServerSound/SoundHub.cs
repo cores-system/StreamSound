@@ -12,7 +12,7 @@ namespace ServerSound
         public static void wi_DataAvailable(object sender, WaveInEventArgs e)
         {
             if (ActivClients != null)
-                ActivClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded);
+                ActivClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded, DateTime.Now);
         }
 
 
@@ -20,7 +20,7 @@ namespace ServerSound
         {
             ActivClients = Clients;
             Console.WriteLine("ConnectionId: " + Context.ConnectionId);
-            Clients.Client(Context.ConnectionId).SendAsync("ConnectionId", Context.ConnectionId, Startup.s.BufferMilliseconds);
+            Clients.Client(Context.ConnectionId).SendAsync("ConnectionId", Context.ConnectionId, Startup.s.BufferMilliseconds, DateTime.Now);
             return base.OnConnectedAsync();
         }
     }

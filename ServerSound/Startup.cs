@@ -23,6 +23,8 @@ namespace ServerSound
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            Console.WriteLine("v: 0.01");
+
             if (File.Exists("settings.json"))
                 s = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
 
