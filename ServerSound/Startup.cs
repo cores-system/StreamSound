@@ -17,13 +17,19 @@ namespace ServerSound
         #region ConfigureServices
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR();
+            // https://docs.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-2.2&tabs=dotnet
+            services.AddSignalR(hubOptions =>
+            {
+                //hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(10); // Почему то заставляет обрывать связь каждые 30+- секунд
+                hubOptions.KeepAliveInterval = TimeSpan.FromMilliseconds(100);
+                hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
+            });
         }
         #endregion
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Console.WriteLine("v: 0.01");
+            Console.WriteLine("v: 0.02");
 
             if (File.Exists("settings.json"))
                 s = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
@@ -40,7 +46,11 @@ namespace ServerSound
             // 
             app.UseSignalR(routes =>
             {
-                routes.MapHub<SoundHub>("/sound");
+                routes.MapHub<SoundHub>("/sound", (options) =>
+                {
+                    options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(2);
+                    options.LongPolling.PollTimeout = TimeSpan.FromSeconds(2);
+                });
             });
 
 

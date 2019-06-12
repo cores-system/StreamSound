@@ -105,6 +105,11 @@ namespace Client
             // Удаленный WaveIn
             hubConnection = new HubConnectionBuilder().WithUrl("http://192.168.0.110:5089/sound").Build();
             hubConnection.Closed += HubConnection_Closed;
+
+            // https://docs.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-2.2&tabs=dotnet
+            hubConnection.ServerTimeout = TimeSpan.FromSeconds(2);
+            hubConnection.KeepAliveInterval = TimeSpan.FromMilliseconds(100);
+            hubConnection.HandshakeTimeout = TimeSpan.FromSeconds(5);
         }
         #endregion
 
