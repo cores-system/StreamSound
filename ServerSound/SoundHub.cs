@@ -13,6 +13,7 @@ namespace ServerSound
         #region SoundHub
         static IHubCallerClients activClients;
         static ConcurrentDictionary<Task, (CancellationToken, DateTime)> sends = new ConcurrentDictionary<Task, (CancellationToken, DateTime)>();
+        static DateTime nextSynTime = DateTime.Today;
         #endregion
 
         #region wi_DataAvailable
@@ -20,26 +21,29 @@ namespace ServerSound
         {
             if (activClients != null)
             {
-                #region Удаляем старые пакеты
-                if (sends.Count > 0)
-                {
-                    foreach (var s in sends)
-                    {
-                        if (DateTime.Now > s.Value.Item2)
-                        {
-                            if (!s.Key.IsCompleted && !s.Key.IsCompletedSuccessfully)
-                                s.Value.Item1.ThrowIfCancellationRequested();
+                activClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded, DateTime.Now);
+                Console.WriteLine("Send: " + DateTime.Now.ToString() + "." + DateTime.Now.Millisecond);
 
-                            s.Key.Dispose();
-                            sends.TryRemove(s.Key, out _);
-                        }
-                    }
-                }
-                #endregion
+                //#region Удаляем старые пакеты
+                //if (sends.Count > 0)
+                //{
+                //    foreach (var s in sends)
+                //    {
+                //        if (DateTime.Now > s.Value.Item2)
+                //        {
+                //            if (!s.Key.IsCompleted && !s.Key.IsCompletedSuccessfully)
+                //                s.Value.Item1.ThrowIfCancellationRequested();
 
-                // Отправляем пакет
-                var cts = new CancellationToken();
-                sends.TryAdd(activClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded, DateTime.Now, cancellationToken: cts), (cts, DateTime.Now.AddMilliseconds(Startup.s.BufferMilliseconds)));
+                //            s.Key.Dispose();
+                //            sends.TryRemove(s.Key, out _);
+                //        }
+                //    }
+                //}
+                //#endregion
+
+                //// Отправляем пакет
+                //var cts = new CancellationToken();
+                //sends.TryAdd(activClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded, DateTime.Now, cancellationToken: cts), (cts, DateTime.Now.AddMilliseconds(Startup.s.BufferMilliseconds)));
             }
         }
         #endregion
@@ -47,6 +51,7 @@ namespace ServerSound
         #region OnConnectedAsync
         public override Task OnConnectedAsync()
         {
+            nextSynTime = DateTime.Now.AddMinutes(1);
             activClients = Clients;
             Clients.Client(Context.ConnectionId).SendAsync("ConnectionId", Context.ConnectionId, Startup.s.BufferMilliseconds, DateTime.Now);
             Console.WriteLine("ConnectionId: " + Context.ConnectionId);

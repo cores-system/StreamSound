@@ -17,7 +17,7 @@ namespace Client
         HubConnection hubConnection;
         NotifyIcon ni = new NotifyIcon();
         TextBox textBox1;
-        private Button button1;
+        private Button button1, button2;
 
         public Form1()
         {
@@ -46,6 +46,15 @@ namespace Client
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new EventHandler(this.RestartTimePlay);
             this.Controls.Add(this.button1);
+
+            this.button2 = new Button();
+            this.button2.Location = new Point(100, 12);
+            this.button2.Size = new Size(75, 23);
+            this.button2.TabIndex = 0;
+            this.button2.Text = "Выход";
+            this.button2.UseVisualStyleBackColor = true;
+            this.button2.Click += new EventHandler(this.ExitApp);
+            this.Controls.Add(this.button2);
 
             ni = new NotifyIcon();
             ni.Icon = new Icon("tree.ico");
@@ -83,6 +92,20 @@ namespace Client
             this.WindowState = FormWindowState.Minimized;
             this.Hide();
             ni.Visible = true;
+        }
+        #endregion
+
+        #region RestartTimePlay
+        private void RestartTimePlay(object sender, EventArgs e)
+        {
+            bwp.ClearBuffer();
+        }
+        #endregion
+
+        #region ExitApp
+        private void ExitApp(object sender, EventArgs e)
+        {
+            Environment.Exit(0);
         }
         #endregion
 
@@ -164,22 +187,22 @@ namespace Client
                     if (differenceMs >= bufferMilliseconds || offset >= BytesRecorded) {
 
                         #region debug
-                        File.AppendAllText("debug.txt",
-                            currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
-                            "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
-                            Environment.NewLine + Environment.NewLine
-                        );
+                        //File.AppendAllText("debug.txt",
+                        //    currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
+                        //    "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
+                        //    Environment.NewLine + Environment.NewLine
+                        //);
                         #endregion
                         return;
                     }
 
                     #region debug
-                    File.AppendAllText("debug.txt",
-                        currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
-                        "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
-                        "offset: " + offset + Environment.NewLine +
-                        Environment.NewLine + Environment.NewLine
-                    );
+                    //File.AppendAllText("debug.txt",
+                    //    currentTime.ToString() + "." + currentTime.Millisecond + Environment.NewLine +
+                    //    "differenceMs: " + differenceMs + " / max: " + bufferMilliseconds + Environment.NewLine +
+                    //    "offset: " + offset + Environment.NewLine +
+                    //    Environment.NewLine + Environment.NewLine
+                    //);
                     #endregion
                 }
 
@@ -199,14 +222,6 @@ namespace Client
                 await HubConnection_Closed(null);
             }
             #endregion
-        }
-        #endregion
-
-
-        #region RestartTimePlay
-        private void RestartTimePlay(object sender, EventArgs e)
-        {
-            bwp.ClearBuffer();
         }
         #endregion
     }

@@ -29,7 +29,7 @@ namespace ServerSound
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Console.WriteLine("v: 0.02");
+            Console.WriteLine("v: 0.02-17");
 
             if (File.Exists("settings.json"))
                 s = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
@@ -48,6 +48,8 @@ namespace ServerSound
             {
                 routes.MapHub<SoundHub>("/sound", (options) =>
                 {
+                    options.ApplicationMaxBufferSize = 1000000;
+                    options.TransportMaxBufferSize = 1000000;
                     options.WebSockets.CloseTimeout = TimeSpan.FromSeconds(2);
                     options.LongPolling.PollTimeout = TimeSpan.FromSeconds(2);
                 });
