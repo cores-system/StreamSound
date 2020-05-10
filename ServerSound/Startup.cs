@@ -21,7 +21,7 @@ namespace ServerSound
             services.AddSignalR(hubOptions =>
             {
                 //hubOptions.ClientTimeoutInterval = TimeSpan.FromSeconds(10); // Почему то заставляет обрывать связь каждые 30+- секунд
-                hubOptions.KeepAliveInterval = TimeSpan.FromMilliseconds(100);
+                hubOptions.KeepAliveInterval = TimeSpan.FromMilliseconds(300);
                 hubOptions.HandshakeTimeout = TimeSpan.FromSeconds(5);
             });
         }
@@ -29,7 +29,7 @@ namespace ServerSound
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            Console.WriteLine("v: 0.02-17");
+            Console.WriteLine("v: 0.03-02");
 
             if (File.Exists("settings.json"))
                 s = JsonConvert.DeserializeObject<Settings>(File.ReadAllText("settings.json"));
@@ -37,7 +37,7 @@ namespace ServerSound
             #region WaveIn
             wi = new WaveInEvent();
             wi.DeviceNumber = s.DeviceNumber;
-            wi.WaveFormat = new WaveFormat(s.WavRate, 2);
+            wi.WaveFormat = new WaveFormat(48000, 2);
             wi.DataAvailable += new EventHandler<WaveInEventArgs>(SoundHub.wi_DataAvailable);
             wi.BufferMilliseconds = s.BufferMilliseconds;
             wi.StartRecording();

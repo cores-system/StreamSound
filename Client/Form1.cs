@@ -42,7 +42,7 @@ namespace Client
             this.button1.Location = new Point(12, 12);
             this.button1.Size = new Size(75, 23);
             this.button1.TabIndex = 0;
-            this.button1.Text = "Очистить буфер";
+            this.button1.Text = "Рестарт";
             this.button1.UseVisualStyleBackColor = true;
             this.button1.Click += new EventHandler(this.RestartTimePlay);
             this.Controls.Add(this.button1);
@@ -98,7 +98,8 @@ namespace Client
         #region RestartTimePlay
         private void RestartTimePlay(object sender, EventArgs e)
         {
-            bwp.ClearBuffer();
+            Process.Start(Application.StartupPath + "\\Client.exe");
+            Environment.Exit(0);
         }
         #endregion
 
@@ -131,7 +132,7 @@ namespace Client
 
             // https://docs.microsoft.com/en-us/aspnet/core/signalr/configuration?view=aspnetcore-2.2&tabs=dotnet
             hubConnection.ServerTimeout = TimeSpan.FromSeconds(2);
-            hubConnection.KeepAliveInterval = TimeSpan.FromMilliseconds(100);
+            hubConnection.KeepAliveInterval = TimeSpan.FromMilliseconds(300);
             hubConnection.HandshakeTimeout = TimeSpan.FromSeconds(5);
         }
         #endregion
@@ -141,7 +142,7 @@ namespace Client
         {
             hubConnection.Closed -= HubConnection_Closed;
             textBox1.Text += "Connection Closed" + Environment.NewLine;
-            hubConnection.DisposeAsync().Wait();
+            await hubConnection.DisposeAsync();
             await Task.Delay(80);
             HubBuilder();
 
@@ -184,7 +185,8 @@ namespace Client
                     offset = (int)(differenceMs * 192); // 1ms = 192 byte
 
                     // Разница больше BufferMilliseconds или больше пакета
-                    if (differenceMs >= bufferMilliseconds || offset >= BytesRecorded) {
+                    if (differenceMs >= bufferMilliseconds || offset >= BytesRecorded)
+                    {
 
                         #region debug
                         //File.AppendAllText("debug.txt",

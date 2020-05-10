@@ -22,7 +22,7 @@ namespace ServerSound
             if (activClients != null)
             {
                 activClients.All.SendAsync("DataAvailable", e.Buffer, e.BytesRecorded, DateTime.Now);
-                Console.WriteLine("Send: " + DateTime.Now.ToString() + "." + DateTime.Now.Millisecond);
+                //Console.WriteLine("Send: " + DateTime.Now.ToString() + "." + DateTime.Now.Millisecond);
 
                 //#region Удаляем старые пакеты
                 //if (sends.Count > 0)

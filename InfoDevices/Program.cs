@@ -7,10 +7,18 @@ namespace InfoDevices
     {
         static void Main(string[] args)
         {
-            for (int waveInDevice = 0; waveInDevice < WaveIn.DeviceCount; waveInDevice++)
+            Console.WriteLine("WaveIn");
+            for (int waveDevice = 0; waveDevice < WaveIn.DeviceCount; waveDevice++)
             {
-                WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(waveInDevice);
-                Console.WriteLine("Device {0}: {1}, {2} channels", waveInDevice, deviceInfo.ProductName, deviceInfo.Channels);
+                WaveInCapabilities deviceInfo = WaveIn.GetCapabilities(waveDevice);
+                Console.WriteLine("Device {0}: {1}, {2} channels", waveDevice, deviceInfo.ProductName, deviceInfo.Channels);
+            }
+
+            Console.WriteLine("\nWaveOut");
+            for (int waveDevice = 0; waveDevice < WaveOut.DeviceCount; waveDevice++)
+            {
+                WaveOutCapabilities deviceInfo = WaveOut.GetCapabilities(waveDevice);
+                Console.WriteLine("Device {0}: {1}, {2} channels", waveDevice, deviceInfo.ProductName, deviceInfo.Channels);
             }
 
             Console.ReadLine();
